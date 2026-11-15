@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Health Check at a Glance</title>
+<meta name="description" content="Crew health console: body model, readings, guides and medical review, all on board.">
+<link rel="icon" href="assets/img/mark.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/css/app.css"><!-- avoid-ai-design-ignore: K7 (focus styles live in app.css: :focus-visible) -->
+</head>
+<body>
+<div class="app" id="app" data-view="overview">
+  <!-- The deck: who is being looked at, where to go, and the body model. It never changes screen. -->
+  <section class="deck" aria-label="Crew member and body model">
+    <header class="ident">
+      <div class="who">
+        <label class="crew-pick"><span class="sr">Crew member</span><select id="crewSel"></select></label>
+        <div class="who-sub" id="whoSub"></div>
+      </div>
+      <dl class="mission">
+        <div><dt>Mission</dt><dd><select id="missionSel" aria-label="Mission"></select></dd></div>
+        <div><dt>Elapsed</dt><dd class="num" id="met">--</dd></div>
+        <div><dt>Ground link</dt><dd class="link" id="linkChip"></dd></div>
+      </dl>
+    </header>
+    <div class="rail">
+      <nav class="ann" id="ann" aria-label="Main"></nav>
+      <div class="rolebox">
+        <span class="ann-l" id="roleLbl">Using as</span>
+        <div class="seg role slider" role="group" aria-labelledby="roleLbl">
+          <button class="role-btn on" data-role="astro" aria-pressed="true">Astronaut</button>
+          <button class="role-btn" data-role="cmo" aria-pressed="false">Medical officer</button>
+          <i class="ink" aria-hidden="true"></i>
+        </div>
+      </div>
+    </div>
+    <div class="bodybar">
+      <div class="modes slider" role="tablist" aria-label="Body view" id="modes"></div>
+      <div class="legend" id="legend"></div>
+    </div>
+    <div class="stage" id="stage"></div>
+  </section>
+  <!-- Everything about the astronaut opens here. -->
+  <aside class="panel" id="panel" aria-live="polite"><div class="panel-in" id="panelIn"></div></aside>
+</div>
+<div class="toast-wrap" id="toasts" aria-live="polite"></div>
+<div class="tip" id="tip" hidden></div>
+<div class="modal" id="modal" hidden><div class="modal-card" role="dialog" aria-modal="true"><div id="modalBody"></div></div></div>
+<script src="assets/js/geometry.js"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>
