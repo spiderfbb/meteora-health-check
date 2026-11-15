@@ -1,0 +1,32 @@
+/* Shared base for the site and the console: type, color tokens, status helpers.
+   Type is Atkinson Hyperlegible Next, designed to stay readable for people with low vision (long missions can change
+   eyesight); numbers use Atkinson Hyperlegible Mono so readings line up and 0/O, 1/l never mix.
+   Color is reserved for status. One accent marks selection, focus and the main action. */
+@font-face{font-family:"Atkinson Hyperlegible Next";src:url(../fonts/atkinson-next-latin-400.woff2) format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"Atkinson Hyperlegible Next";src:url(../fonts/atkinson-next-latin-500.woff2) format("woff2");font-weight:500;font-display:swap}
+@font-face{font-family:"Atkinson Hyperlegible Next";src:url(../fonts/atkinson-next-latin-600.woff2) format("woff2");font-weight:600;font-display:swap}
+@font-face{font-family:"Atkinson Hyperlegible Next";src:url(../fonts/atkinson-next-latin-700.woff2) format("woff2");font-weight:700;font-display:swap}
+@font-face{font-family:"Atkinson Hyperlegible Mono";src:url(../fonts/atkinson-mono-latin-400.woff2) format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"Atkinson Hyperlegible Mono";src:url(../fonts/atkinson-mono-latin-500.woff2) format("woff2");font-weight:500;font-display:swap}
+@font-face{font-family:"Atkinson Hyperlegible Mono";src:url(../fonts/atkinson-mono-latin-600.woff2) format("woff2");font-weight:600;font-display:swap}
+
+:root{
+  color-scheme:dark;
+  /* surfaces, darkest to lightest: neutral graphite, so status colors carry the meaning */
+  --void:#090C11; --hull:#0C1016; --panel:#10151C; --raised:#161C25; --raised2:#1C242F; --float:#151B23;
+  --line:#232C37; --line2:#1A212A; --line3:#303B48;
+  /* text */
+  --ink:#E8ECF1; --ink2:#AEB7C2; --muted:#8A94A1; --faint:#5F6976;
+  /* one accent: selection, focus and the main action */
+  --accent:#78B6E6; --accent-dim:rgba(120,182,230,.13); --accent-line:rgba(120,182,230,.55); --accent-ink:#07131D;
+  /* status */
+  --good:#3DB97A; --warn:#E3A23B; --bad:#E85D5A;
+  --good-bg:rgba(61,185,122,.12); --warn-bg:rgba(227,162,59,.13); --bad-bg:rgba(232,93,90,.14); --info-bg:rgba(120,182,230,.11);
+  --r:6px; --r-sm:5px; --r-lg:10px;
+  --pw:520px; --ease:cubic-bezier(.22,.8,.24,1);
+  --sans:"Atkinson Hyperlegible Next","Segoe UI",system-ui,sans-serif;
+  --mono:"Atkinson Hyperlegible Mono",ui-monospace,Consolas,monospace;
+  --cond:var(--sans);
+  font-family:var(--sans);
+}
+.s-good{--st:var(--good)}.s-warn{--st:var(--warn)}.s-bad{--st:var(--bad)}.s-info{--st:var(--accent)}.s-off{--st:var(--faint)}

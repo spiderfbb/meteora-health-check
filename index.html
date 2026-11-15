@@ -2,52 +2,189 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Health Check at a Glance</title>
-<meta name="description" content="Crew health console: body model, readings, guides and medical review, all on board.">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Health Check at a Glance · Crew health console</title>
+<meta name="description" content="An offline crew health console for long space missions. One body model, readings checked against flight health limits, first-aid guides, and medical review by the Crew Medical Officer.">
+<meta name="theme-color" content="#090C11">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Health Check at a Glance">
+<meta property="og:description" content="An offline crew health console for long space missions: one body model, readings checked against flight health limits, and medical review on board.">
+<meta property="og:image" content="assets/img/og.png">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="assets/img/mark.svg" type="image/svg+xml">
-<link rel="stylesheet" href="assets/css/app.css"><!-- avoid-ai-design-ignore: K7 (focus styles live in app.css: :focus-visible) -->
+<link rel="apple-touch-icon" href="assets/img/icon-180.png">
+<!-- avoid-ai-design-ignore: K7 (focus styles live in site.css: :focus-visible) -->
+<link rel="stylesheet" href="assets/css/base.css">
+<!-- avoid-ai-design-ignore: K7 (focus styles live in site.css: :focus-visible) -->
+<link rel="stylesheet" href="assets/css/site.css">
+<script src="assets/js/data.js" defer></script>
+<script src="assets/js/figures.js" defer></script>
+<script src="assets/js/site.js" defer></script>
 </head>
 <body>
-<div class="app" id="app" data-view="overview">
-  <!-- The deck: who is being looked at, where to go, and the body model. It never changes screen. -->
-  <section class="deck" aria-label="Crew member and body model">
-    <header class="ident">
-      <div class="who">
-        <label class="crew-pick"><span class="sr">Crew member</span><select id="crewSel"></select></label>
-        <div class="who-sub" id="whoSub"></div>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top">
+  <div class="wrap top-in">
+    <a class="brand" href="index.html" aria-label="Health Check at a Glance, home"><img src="assets/img/mark.svg" alt="" width="28" height="28"><span>Health Check at a Glance</span></a>
+    <nav class="top-nav" aria-label="Sections">
+      <a href="#how">How it works</a>
+      <a href="#console">Inside the console</a>
+      <a href="#missions">Missions</a>
+      <a href="#standards">Standards</a>
+    </nav>
+    <a class="btn primary" href="console.html">Open the console</a>
+  </div>
+</header>
+
+<main id="main">
+  <section class="hero wrap" aria-labelledby="heroT">
+    <div class="hero-copy">
+      <p class="kicker">Crew health console for long-duration missions</p>
+      <h1 id="heroT">Know where your body stands, even when Earth is minutes away.</h1>
+      <p class="lede">Health Check at a Glance brings body readings, cabin air and space weather onto one body model. Each reading is checked against flight health limits, explained in plain words, and tied to a next step: an exercise, a first-aid guide, or a summary for the Crew Medical Officer to approve.</p>
+      <div class="cta">
+        <a class="btn primary lg" href="console.html">Open the console</a>
+        <a class="btn ghost lg" href="#how">How it works</a>
       </div>
-      <dl class="mission">
-        <div><dt>Mission</dt><dd><select id="missionSel" aria-label="Mission"></select></dd></div>
-        <div><dt>Elapsed</dt><dd class="num" id="met">--</dd></div>
-        <div><dt>Ground link</dt><dd class="link" id="linkChip"></dd></div>
+      <dl class="facts">
+        <div><dt>Works offline</dt><dd>Runs on board with no network link</dd></div>
+        <div><dt data-count="missions">4 missions</dt><dd>From the ISS to a Mars transit</dd></div>
+        <div><dt data-count="almanac">41 entries</dt><dd>First aid, exercise and daily health</dd></div>
       </dl>
-    </header>
-    <div class="rail">
-      <nav class="ann" id="ann" aria-label="Main"></nav>
-      <div class="rolebox">
-        <span class="ann-l" id="roleLbl">Using as</span>
-        <div class="seg role slider" role="group" aria-labelledby="roleLbl">
-          <button class="role-btn on" data-role="astro" aria-pressed="true">Astronaut</button>
-          <button class="role-btn" data-role="cmo" aria-pressed="false">Medical officer</button>
-          <i class="ink" aria-hidden="true"></i>
-        </div>
+    </div>
+
+    <figure class="hero-fig">
+      <div class="fig-modes" role="tablist" aria-label="Body view">
+        <button role="tab" aria-selected="true" data-fig="train">Train</button>
+        <button role="tab" aria-selected="false" data-fig="treat">Treat</button>
+        <button role="tab" aria-selected="false" data-fig="organs">Organs</button>
+        <button role="tab" aria-selected="false" data-fig="elements">Elements</button>
+      </div>
+      <div class="fig-stage" id="figStage" role="img" aria-label="Front and back body model, colored by status"></div>
+      <figcaption>
+        <p id="figText">Each muscle group is colored by strength against preflight. Here the calves and shins are at Warning.</p>
+        <ul class="legend" aria-label="Status key">
+          <li><i class="sw good"></i>Nominal</li>
+          <li><i class="sw warn"></i>Caution, dotted</li>
+          <li><i class="sw bad"></i>Warning, hatched</li>
+        </ul>
+        <p class="note">Sample crew member. Readings are simulated.</p>
+      </figcaption>
+    </figure>
+  </section>
+
+  <section class="band" id="how" aria-labelledby="howT">
+    <div class="wrap">
+      <header class="sec-h">
+        <h2 id="howT">From a reading to a decision</h2>
+        <p>The console follows the same path every time, so a crew member knows what happens after each check.</p>
+      </header>
+      <ol class="flow">
+        <li>
+          <h3>Check in</h3>
+          <p>Each morning the astronaut logs vitals from the on-board sensors, then water, sleep, mood and any symptoms. A photo can be attached for a skin change or an injury.</p>
+        </li>
+        <li>
+          <h3>See the status</h3>
+          <p>Every reading is compared with its limit. Status always pairs a color with a shape and a word, and the body model adds a texture, so it never relies on color alone.</p>
+          <div class="chips" id="statusChips"></div>
+        </li>
+        <li>
+          <h3>Follow a guide</h3>
+          <p>Low strength opens exercises on the equipment carried on that mission. A symptom opens a first-aid guide adapted for microgravity, which starts with red-flag checks.</p>
+        </li>
+        <li>
+          <h3>Send for review</h3>
+          <p>When a reading needs a professional, the console builds a summary with the readings, the 14-day range, cabin conditions, symptoms and steps already taken. The Crew Medical Officer decides.</p>
+          <div class="chips"><span class="chip">Approve</span><span class="chip">Re-measure</span><span class="chip">Escalate</span></div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="band" id="console" aria-labelledby="conT">
+    <div class="wrap">
+      <header class="sec-h">
+        <h2 id="conT">Inside the console</h2>
+        <p>The body model stays on screen. Everything about the crew member opens in the panel beside it, so the astronaut never loses their place.</p>
+      </header>
+      <figure class="shot">
+        <img src="assets/img/console.webp" width="2880" height="1800" loading="lazy" decoding="async" alt="The console overview: navigation on the left, the front and back body model in the middle, and a panel on the right listing readings that need attention.">
+        <figcaption>Overview for a sample crew member. Readings are simulated.</figcaption>
+      </figure>
+      <div class="features">
+        <article><h3>Daily check-in</h3><p>Fill vitals from the sensors or type them in, log water by the cup, rate mood, tick symptoms and attach a photo.</p></article>
+        <article><h3>Trends</h3><p>Fourteen-day charts with the normal band shaded. A crosshair reads any day, and readings outside the band are counted on the menu.</p></article>
+        <article><h3>Medical review</h3><p>A summary moves from sent to received and under review, then ends approved, sent back for a re-measure, or escalated to flight surgeons.</p></article>
+        <article><h3>Habitat</h3><p>Carbon dioxide, oxygen, temperature, humidity, pressure and radiation for each module, checked against flight limits.</p></article>
+        <article><h3>Space weather</h3><p>Solar event notifications from NASA DONKI, live when a link is up and kept on board when it is not, with a shelter drill.</p></article>
+        <article><h3>Almanac</h3><p>Offline entries for first aid, exercise and daily health. Searchable with no network, and linked from every guide.</p></article>
       </div>
     </div>
-    <div class="bodybar">
-      <div class="modes slider" role="tablist" aria-label="Body view" id="modes"></div>
-      <div class="legend" id="legend"></div>
-    </div>
-    <div class="stage" id="stage"></div>
   </section>
-  <!-- Everything about the astronaut opens here. -->
-  <aside class="panel" id="panel" aria-live="polite"><div class="panel-in" id="panelIn"></div></aside>
-</div>
-<div class="toast-wrap" id="toasts" aria-live="polite"></div>
-<div class="tip" id="tip" hidden></div>
-<div class="modal" id="modal" hidden><div class="modal-card" role="dialog" aria-modal="true"><div id="modalBody"></div></div></div>
-<script src="assets/js/geometry.js"></script>
-<script src="assets/js/data.js"></script>
-<script src="assets/js/app.js"></script>
+
+  <section class="band" id="missions" aria-labelledby="misT">
+    <div class="wrap">
+      <header class="sec-h">
+        <h2 id="misT">One console, four missions</h2>
+        <p>Gravity, equipment and the delay to Earth change with the mission. Exercise names follow the equipment carried, and escalation advice accounts for how long a reply takes.</p>
+      </header>
+      <div class="missions" id="missionList"></div>
+    </div>
+  </section>
+
+  <section class="band" id="standards" aria-labelledby="stdT">
+    <div class="wrap">
+      <header class="sec-h">
+        <h2 id="stdT">Checked against published limits</h2>
+        <p>One set of rules decides every status. The same rules drive the body model, the menu and the review summaries, and each one names its source.</p>
+      </header>
+      <div class="tbl-wrap">
+        <table class="std">
+          <thead><tr><th scope="col">Reading</th><th scope="col">Nominal</th><th scope="col">Source</th></tr></thead>
+          <tbody id="stdRows"></tbody>
+        </table>
+      </div>
+      <div class="nasa">
+        <h3>NASA data in the console</h3>
+        <ul>
+          <li>NASA-STD-3001 limits, through the OCHMO technical briefs</li>
+          <li>NASA Human Research Program evidence on bone loss</li>
+          <li>NASA DONKI space weather notifications</li>
+          <li>NASA Human Research Program hazards of spaceflight</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="band close" aria-labelledby="goT">
+    <div class="wrap close-in">
+      <div>
+        <h2 id="goT">Open the console</h2>
+        <p>No account and nothing to install. Choose how you are using it, pick a crew member, and start a session.</p>
+      </div>
+      <a class="btn primary lg" href="console.html">Open the console</a>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-in">
+    <div class="foot-id">
+      <a class="brand" href="index.html"><img src="assets/img/mark.svg" alt="" width="24" height="24"><span>Health Check at a Glance</span></a>
+      <p>Made by Team Meteora for the NASA Space Apps Challenge 2026, Legazpi City.</p>
+    </div>
+    <nav class="foot-nav" aria-label="Footer">
+      <a href="console.html">Console</a>
+      <a href="#standards">Standards</a>
+      <a href="https://github.com/spiderfbb/meteora-health-check" rel="noopener">Source code</a>
+    </nav>
+  </div>
+  <div class="wrap foot-fine">
+    <p>Crew members and readings are simulated. The console is not a medical device and does not diagnose. Not affiliated with or endorsed by NASA.</p>
+    <p>Parts of the code and text were drafted with AI assistance and reviewed by the team.</p>
+  </div>
+</footer>
 </body>
 </html>

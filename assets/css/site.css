@@ -1,0 +1,181 @@
+/* Health Check at a Glance: the public home page.
+   Uses the console's tokens (base.css) so the site and the console read as one product.
+   The page leads with the console's own body model; status colors appear only where they mean status. */
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:76px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
+body{background:var(--void);color:var(--ink);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+img,svg{display:block;max-width:100%}
+a{color:var(--accent)}
+button{font:inherit;color:inherit;border:none;background:none;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
+.wrap{width:100%;max-width:1200px;margin:0 auto;padding:0 32px}
+.skip{position:absolute;left:16px;top:-60px;z-index:100;padding:10px 14px;border-radius:var(--r);background:var(--accent);color:var(--accent-ink);font-weight:700;text-decoration:none}
+.skip:focus{top:12px}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:38px;padding:0 16px;border-radius:var(--r);font-weight:700;font-size:15px;text-decoration:none;white-space:nowrap;
+  transition:background-color .18s,border-color .18s,color .18s}
+.btn.primary{background:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover{background:#93C6EE}
+.btn.ghost{border:1px solid var(--line3);color:var(--ink)}
+.btn.ghost:hover{background:var(--raised);border-color:#3D4A59}
+.btn.lg{height:46px;padding:0 22px;font-size:16px}
+
+/* top bar */
+.top{position:sticky;top:0;z-index:20;background:var(--void);border-bottom:1px solid var(--line2)}
+.top-in{display:flex;align-items:center;gap:28px;height:64px}
+.brand{display:inline-flex;align-items:center;gap:10px;color:var(--ink);text-decoration:none;font-weight:700;font-size:16px;letter-spacing:-.005em;white-space:nowrap}
+.top-nav{display:flex;gap:4px}
+.top-in>.brand{margin-right:auto}
+.top-nav a{color:var(--ink2);text-decoration:none;font-size:14.5px;font-weight:600;padding:7px 11px;border-radius:var(--r);transition:color .18s,background-color .18s}
+.top-nav a:hover{color:var(--ink);background:var(--raised)}
+
+/* hero: the console's own body model, switchable by mode */
+.hero{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:56px;align-items:center;padding-top:64px;padding-bottom:72px}
+.kicker{font-size:15px;font-weight:600;color:var(--accent);margin-bottom:14px}
+.hero h1{font-size:clamp(34px,4.4vw,54px);line-height:1.06;font-weight:700;letter-spacing:-.022em;max-width:15ch}
+.lede{margin-top:20px;font-size:18px;line-height:1.6;color:var(--ink2);max-width:52ch}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+.facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;margin-top:44px;border-top:1px solid var(--line)}
+.facts div{padding:16px 18px 0 0}
+.facts div+div{padding-left:18px;border-left:1px solid var(--line2)}
+.facts dt{font-weight:700;font-size:16px}
+.facts dd{color:var(--muted);font-size:14px;line-height:1.45;margin-top:2px}
+
+.hero-fig{position:relative;border:1px solid var(--line);border-radius:14px;padding:16px 18px 18px;
+  background:radial-gradient(ellipse 70% 60% at 50% 55%,#121821 0%,#0B0F15 65%,var(--hull) 100%)}
+.fig-modes{display:flex;gap:4px;padding:4px;border:1px solid var(--line);border-radius:var(--r-lg);background:var(--panel);width:max-content;max-width:100%}
+.fig-modes button{padding:7px 14px;border-radius:7px;font-size:14.5px;font-weight:600;color:var(--ink2);transition:background-color .2s,color .2s}
+.fig-modes button:hover{color:var(--ink);background:var(--raised)}
+.fig-modes button[aria-selected=true]{background:var(--raised2);color:var(--ink);box-shadow:inset 0 0 0 1px var(--accent-line)}
+.fig-stage{aspect-ratio:626/560;margin-top:8px;display:grid}
+.fig-stage svg{width:100%;height:100%;grid-area:1/1;transition:opacity .35s var(--ease)}
+.fig-stage svg.out{opacity:0}
+.fig-stage svg text{font-family:var(--sans)}
+.hero-fig figcaption{border-top:1px solid var(--line2);padding-top:12px;margin-top:6px}
+#figText{font-size:15px;color:var(--ink2);min-height:3.1em}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;list-style:none;margin-top:8px;font-size:13.5px;color:var(--ink2)}
+.legend li{display:flex;align-items:center;gap:7px}
+.sw{width:13px;height:13px;border-radius:3px;flex:none}
+.sw.good{background:#2F7D57}
+.sw.warn{background:radial-gradient(circle,#F0C77F 1.1px,transparent 1.4px) 0 0/4px 4px,#B98432}
+.sw.bad{background:repeating-linear-gradient(45deg,#F2A09E 0 1.2px,transparent 1.2px 4px),#C65553}
+.note{font-size:13px;color:var(--faint);margin-top:8px}
+
+/* sections */
+.band{border-top:1px solid var(--line2);padding:88px 0}
+.sec-h{max-width:720px;margin-bottom:40px}
+.sec-h h2{font-size:clamp(28px,3vw,36px);line-height:1.15;font-weight:700;letter-spacing:-.018em}
+.sec-h p{margin-top:12px;font-size:17px;color:var(--ink2);line-height:1.6}
+h3{font-size:17px;font-weight:700;letter-spacing:-.005em}
+
+/* how it works: one path, four stops */
+.flow{list-style:none;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:28px;counter-reset:step;position:relative}
+.flow::before{content:"";position:absolute;left:5px;right:0;top:5px;height:1px;background:linear-gradient(90deg,var(--accent-line),var(--line) 70%)}
+.flow li{position:relative;padding-top:30px}
+.flow li::before{content:"";position:absolute;left:0;top:0;width:11px;height:11px;border-radius:50%;background:var(--void);border:2px solid var(--accent)}
+.flow p{margin-top:8px;font-size:15px;color:var(--ink2);line-height:1.6}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.chip{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;border-radius:999px;border:1px solid var(--line3);font-size:13.5px;font-weight:600;color:var(--ink2)}
+.chip.st{border-color:transparent;color:var(--st);background:color-mix(in srgb,var(--st) 13%,transparent)}
+.chip svg{width:12px;height:12px}
+
+/* inside the console */
+.shot{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--hull)}
+.shot img{width:100%;height:auto}
+.shot figcaption{padding:10px 16px;font-size:13.5px;color:var(--faint);border-top:1px solid var(--line2)}
+.features{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 40px;margin-top:48px}
+.features article{padding:20px 0 26px;border-top:1px solid var(--line)}
+.features p{margin-top:6px;font-size:15px;color:var(--ink2);line-height:1.6}
+
+/* missions */
+.missions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.mis{padding:22px 22px 24px;background:var(--panel)}
+.mis+.mis{border-left:1px solid var(--line)}
+.mis small{display:block;font-size:13px;color:var(--muted)}
+.mis .delay{font-family:var(--mono);font-size:26px;font-weight:500;letter-spacing:-.02em;margin:6px 0 2px;color:var(--ink)}
+.mis .bar{height:4px;border-radius:2px;background:var(--line);margin:12px 0 18px;overflow:hidden}
+.mis .bar i{display:block;height:100%;background:var(--accent);border-radius:2px}
+.mis h3{font-size:16px}
+.mis dl{margin-top:10px;display:grid;gap:8px}
+.mis dt{font-size:12.5px;color:var(--muted)}
+.mis dd{font-size:14.5px;color:var(--ink2);line-height:1.45}
+
+/* standards */
+.tbl-wrap{border:1px solid var(--line);border-radius:14px;overflow:auto}
+.std{width:100%;border-collapse:collapse;font-size:15px}
+.std th{text-align:left;font-size:13px;font-weight:600;color:var(--muted);padding:12px 18px;background:var(--panel);border-bottom:1px solid var(--line)}
+.std td{padding:12px 18px;border-bottom:1px solid var(--line2);vertical-align:top}
+.std tr:last-child td{border-bottom:none}
+.std td:first-child{font-weight:600}
+.std td:nth-child(2){font-family:var(--mono);font-size:14.5px;letter-spacing:-.02em;color:var(--ink);white-space:nowrap}
+.std td:last-child a{color:var(--ink2);text-decoration-color:var(--line3);text-underline-offset:3px}
+.std td:last-child a:hover{color:var(--accent);text-decoration-color:currentColor}
+.nasa{margin-top:32px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:24px;align-items:start}
+.nasa ul{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:10px 28px}
+.nasa li{font-size:15px;color:var(--ink2);padding-left:16px;position:relative}
+.nasa li::before{content:"";position:absolute;left:0;top:.62em;width:6px;height:6px;border-radius:50%;background:var(--accent)}
+
+/* closing */
+.close{background:linear-gradient(180deg,var(--hull),var(--void))}
+.close-in{display:flex;align-items:center;justify-content:space-between;gap:24px 40px;flex-wrap:wrap}
+.close h2{font-size:clamp(28px,3vw,36px);font-weight:700;letter-spacing:-.018em}
+.close p{margin-top:8px;color:var(--ink2);font-size:17px;max-width:56ch}
+
+/* footer */
+.foot{border-top:1px solid var(--line2);padding:40px 0 48px;font-size:14px;color:var(--muted)}
+.foot-in{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.foot-id p{margin-top:10px}
+.foot-nav{display:flex;gap:22px;flex-wrap:wrap}
+.foot-nav a{color:var(--ink2);text-decoration:none;font-weight:600}
+.foot-nav a:hover{color:var(--ink)}
+.foot-fine{margin-top:28px;padding-top:20px;border-top:1px solid var(--line2);display:grid;gap:4px;font-size:13px;color:var(--faint)}
+
+/* responsive */
+@media (max-width:1080px){
+  .hero{grid-template-columns:1fr;gap:44px;padding-top:48px}
+  .hero h1{max-width:20ch}
+  .hero-fig{max-width:720px}
+  .flow{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:40px}
+  .flow::before{display:none}
+  .missions{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .mis:nth-child(3){border-left:none}
+  .mis:nth-child(n+3){border-top:1px solid var(--line)}
+}
+@media (max-width:820px){
+  .top-nav{display:none}
+  .features{grid-template-columns:1fr 1fr}
+  .nasa{grid-template-columns:1fr}
+}
+@media (max-width:560px){
+  .wrap{padding:0 16px}
+  .top-in{gap:12px}
+  .brand span{font-size:15px}
+  .top-in .btn{height:36px;padding:0 12px;font-size:14px}
+  .band{padding:64px 0}
+  .lede{font-size:16.5px}
+  .cta .btn{flex:1}
+  .facts{grid-template-columns:1fr}
+  .facts div,.facts div+div{padding:12px 0;border-left:none;border-bottom:1px solid var(--line2)}
+  .hero-fig{padding:12px}
+  .fig-modes{width:100%}
+  .fig-modes button{flex:1;padding:7px 4px;font-size:13.5px}
+  .flow,.features,.missions{grid-template-columns:1fr}
+  .flow{row-gap:28px}
+  .flow::before{display:block;left:5px;right:auto;top:6px;bottom:6px;width:1px;height:auto;background:linear-gradient(180deg,var(--accent-line),var(--line) 80%)}
+  .flow li{padding:0 0 0 30px}
+  .mis+.mis{border-left:none;border-top:1px solid var(--line)}
+  .nasa ul{grid-template-columns:1fr}
+  .std thead{display:none}
+  .std,.std tbody,.std tr,.std td{display:block;width:100%}
+  .std tr{padding:12px 14px;border-bottom:1px solid var(--line2)}
+  .std tr:last-child{border-bottom:none}
+  .std td{padding:0;border:none}
+  .std td:nth-child(2){white-space:normal;margin:3px 0 4px}
+  .std td:last-child{font-size:13.5px}
+}
+
+/* not found */
+.nf{min-height:calc(100vh - 65px);display:flex;flex-direction:column;justify-content:center;padding-top:40px;padding-bottom:80px}
+.nf h1{font-size:clamp(32px,4vw,48px);line-height:1.1;font-weight:700;letter-spacing:-.02em}

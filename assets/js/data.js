@@ -75,7 +75,7 @@ const RULES = {
 };
 const STATUS_WORD={good:"Nominal",warn:"Caution",bad:"Warning"};
 const STATUS_MEANING={good:"Within reference range. Keep the routine.",warn:"Outside reference range. Follow the guide and re-check.",bad:"Send a summary to the Crew Medical Officer for review."};
-const STATUS_COLOR={good:"#3DBE7A",warn:"#E9A93A",bad:"#EF5B5B"};
+const STATUS_COLOR={good:"#3DB97A",warn:"#E3A23B",bad:"#E85D5A"};
 
 /* ---------- Missions ---------- */
 const MISSIONS = {
@@ -160,11 +160,11 @@ const DONKI = [
   ["RBE","20261016-AL-001","2026-10-16T13:28Z","Significantly elevated energetic electron fluxes in the Earth's outer radiation belt."]
 ];
 const DONKI_TYPES = {
-  RBE:{label:"RBE",name:"Radiation belt enhancement",color:"#E9A93A",bg:"rgba(233,169,58,.14)",action:"Elevated electrons in Earth's outer radiation belt. Low effect inside the cabin; flight control reviews any planned spacewalk."},
-  CME:{label:"CME",name:"Coronal mass ejection",color:"#B3A6F5",bg:"rgba(154,134,240,.16)",action:"Watch only. A CME can lead to a geomagnetic storm or particle event; no crew action unless an SEP alert follows."},
-  GST:{label:"GST",name:"Geomagnetic storm",color:"#5CC8E8",bg:"rgba(92,200,232,.14)",action:"Storm in Earth's magnetosphere. Expect higher dose rates on orbits through high latitudes; keep dosimeter on."},
-  SEP:{label:"SEP",name:"Solar energetic particles",color:"#EF5B5B",bg:"rgba(239,91,91,.15)",action:"Move to the shielded area and follow the solar event procedure until the all-clear."},
-  Report:{label:"WEEK",name:"Weekly space weather report",color:"#AEBAD0",bg:"rgba(174,186,208,.12)",action:"Weekly summary from NASA's space weather team."}
+  RBE:{label:"RBE",name:"Radiation belt enhancement",color:"#B7C3D1",bg:"rgba(183,195,209,.10)",action:"Elevated electrons in Earth's outer radiation belt. Low effect inside the cabin; flight control reviews any planned spacewalk."},
+  CME:{label:"CME",name:"Coronal mass ejection",color:"#B7C3D1",bg:"rgba(183,195,209,.10)",action:"Watch only. A CME can lead to a geomagnetic storm or particle event; no crew action unless an SEP alert follows."},
+  GST:{label:"GST",name:"Geomagnetic storm",color:"#B7C3D1",bg:"rgba(183,195,209,.10)",action:"Storm in Earth's magnetosphere. Expect higher dose rates on orbits through high latitudes; keep dosimeter on."},
+  SEP:{label:"SEP",name:"Solar energetic particles",color:"#E85D5A",bg:"rgba(232,93,90,.15)",action:"Move to the shielded area and follow the solar event procedure until the all-clear."},
+  Report:{label:"WEEK",name:"Weekly space weather report",color:"#8A94A1",bg:"rgba(138,148,161,.10)",action:"Weekly summary from NASA's space weather team."}
 };
 
 /* ---------- Muscle groups (Train mode) ---------- */

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Console · Health Check at a Glance</title>
+<meta name="description" content="Crew health console: body model, readings, guides and medical review, all on board.">
+<link rel="icon" href="assets/img/mark.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/img/icon-180.png">
+<meta name="theme-color" content="#090C11">
+<link rel="stylesheet" href="assets/css/base.css">
+<link rel="stylesheet" href="assets/css/app.css"><!-- avoid-ai-design-ignore: K7 (focus styles live in app.css: :focus-visible) -->
+</head>
+<body>
+<div class="app" id="app" data-view="overview">
+  <!-- The deck: who is being looked at, where to go, and the body model. It never changes screen. -->
+  <section class="deck" aria-label="Crew member and body model">
+    <header class="ident">
+      <div class="picker crew" data-pk="crew">
+        <button class="pk-btn" data-picker="crew" aria-haspopup="listbox" aria-expanded="false" aria-label="Crew member, change">
+          <span class="av" id="crewAv"></span>
+          <span class="pk-t"><b id="crewName"></b><small id="whoSub"></small></span><svg class="chev" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </button>
+        <div class="pk-pop" role="listbox" aria-label="Crew member" hidden></div>
+      </div>
+      <div class="mission">
+        <div class="picker field" data-pk="mission">
+          <button class="pk-btn" data-picker="mission" aria-haspopup="listbox" aria-expanded="false">
+            <span class="pk-t"><small>Mission</small><b id="missionName"></b></span><svg class="chev" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </button>
+          <div class="pk-pop" role="listbox" aria-label="Mission" hidden></div>
+        </div>
+        <div class="tm"><small>Elapsed</small><b class="num" id="met">--</b></div>
+        <div class="tm"><small>Ground link</small><b class="link" id="linkChip"></b></div>
+      </div>
+    </header>
+    <div class="rail">
+      <nav class="ann" id="ann" aria-label="Main"></nav>
+      <div class="rolebox">
+        <div class="picker role up" data-pk="role">
+          <button class="pk-btn" data-picker="role" aria-haspopup="listbox" aria-expanded="false">
+            <span class="ri" id="roleIcon"></span>
+            <span class="pk-t"><small>Using as</small><b id="roleName"></b></span><svg class="chev" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </button>
+          <div class="pk-pop" role="listbox" aria-label="Using the console as" hidden></div>
+        </div>
+      </div>
+    </div>
+    <div class="bodybar">
+      <div class="modes slider" role="tablist" aria-label="Body view" id="modes"></div>
+      <div class="legend" id="legend"></div>
+    </div>
+    <div class="stage" id="stage"></div>
+  </section>
+  <!-- Everything about the astronaut opens here. -->
+  <aside class="panel" id="panel" aria-live="polite"><div class="panel-in" id="panelIn"></div></aside>
+</div>
+<section class="gate" id="gate" aria-label="Start a session" hidden></section>
+<div class="toast-wrap" id="toasts" aria-live="polite"></div>
+<div class="tip" id="tip" hidden></div>
+<div class="modal" id="modal" hidden><div class="modal-card" role="dialog" aria-modal="true"><div id="modalBody"></div></div></div>
+<script src="assets/js/geometry.js"></script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>

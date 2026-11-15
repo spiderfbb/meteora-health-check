@@ -15,10 +15,10 @@ function rng(seed){let a=seed;return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a
 function series([a,b,noise],n,seed,dec){const r=rng(seed),out=[];for(let i=0;i<n;i++){const t=i/(n-1);const ease=t*t*(3-2*t);let v=a+(b-a)*(i>n*0.55?ease:t*0.35);v+= (i===n-1?0:(r()-.5)*2*noise);out.push(+v.toFixed(dec))}out[n-1]=+b.toFixed(dec);return out}
 function mix(c1,c2,t){const p=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));const a=p(c1),b=p(c2);return'#'+a.map((x,i)=>Math.round(x+(b[i]-x)*t).toString(16).padStart(2,'0')).join('')}
 const ICON={
-  good:'<svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="6" fill="currentColor"/><path d="M3.3 6.2l1.8 1.8 3.6-3.8" stroke="#0B111A" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-  warn:'<svg viewBox="0 0 12 12"><path d="M6 .8l5.4 10H.6z" fill="currentColor"/><path d="M6 4.3v3" stroke="#0B111A" stroke-width="1.4" stroke-linecap="round"/><circle cx="6" cy="9" r=".75" fill="#0B111A"/></svg>',
-  bad:'<svg viewBox="0 0 12 12"><path d="M3.6 .5h4.8L11.5 3.6v4.8L8.4 11.5H3.6L.5 8.4V3.6z" fill="currentColor"/><path d="M6 3.2v3.4" stroke="#0B111A" stroke-width="1.5" stroke-linecap="round"/><circle cx="6" cy="8.7" r=".8" fill="#0B111A"/></svg>',
-  info:'<svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="6" fill="currentColor"/><path d="M6 5.3v3.3" stroke="#0B111A" stroke-width="1.5" stroke-linecap="round"/><circle cx="6" cy="3.4" r=".8" fill="#0B111A"/></svg>'
+  good:'<svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="6" fill="currentColor"/><path d="M3.3 6.2l1.8 1.8 3.6-3.8" stroke="#0C1016" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  warn:'<svg viewBox="0 0 12 12"><path d="M6 .8l5.4 10H.6z" fill="currentColor"/><path d="M6 4.3v3" stroke="#0C1016" stroke-width="1.4" stroke-linecap="round"/><circle cx="6" cy="9" r=".75" fill="#0C1016"/></svg>',
+  bad:'<svg viewBox="0 0 12 12"><path d="M3.6 .5h4.8L11.5 3.6v4.8L8.4 11.5H3.6L.5 8.4V3.6z" fill="currentColor"/><path d="M6 3.2v3.4" stroke="#0C1016" stroke-width="1.5" stroke-linecap="round"/><circle cx="6" cy="8.7" r=".8" fill="#0C1016"/></svg>',
+  info:'<svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="6" fill="currentColor"/><path d="M6 5.3v3.3" stroke="#0C1016" stroke-width="1.5" stroke-linecap="round"/><circle cx="6" cy="3.4" r=".8" fill="#0C1016"/></svg>'
 };
 const icon=(st,size=12)=>ICON[st].replace('<svg',`<svg width="${size}" height="${size}" style="color:${STATUS_COLOR[st]||'var(--accent)'}" aria-hidden="true"`);
 const pill=(st,txt)=>`<span class="status ${st}">${ICON[st]}${esc(txt||STATUS_WORD[st])}</span>`;
@@ -81,7 +81,7 @@ function watchList(){
 
 /* ---------- body figure (traced 2D map, front and back) ---------- */
 const UNFILLED=new Set(['head','neck','pelvis','knees','sternum','hands','feet']);
-const FIG={muscle:'#24324B',zone:'#18223A',line:'#9DB0CC',sil:'#172235',silLine:'#5E7395',bone:'#33445F'};
+const FIG={muscle:'#27313E',zone:'#1A212B',line:'#A2AFBF',sil:'#18202A',silLine:'#5D6B7D',bone:'#364353'};
 /* The reference drawing stops at mid-shin. These drawn extensions carry each leg down to the
    ankle and foot so the map shows the whole body. They join the traced shins and calves at
    y = 486 and are mirrored across each figure's centre line (front x = 159.6, back x = 468.3). */
@@ -98,17 +98,27 @@ const LEG={
      foot:'M413.4 524.6C412 532 409.6 539 409.2 544C408.8 549.6 413 552 420.2 552C427.4 552 431.6 549.6 431.2 544C430.8 539 428.4 532 427 524.6Z',
      detail:'M420.2 506V532M414.6 547.6Q420.2 549.6 425.8 547.6'}
 };
+/* Train and Treat use the traced line art, which ends in a cropped ledge at y = 486. The muscle map
+   is clipped at CUT_Y and these pieces start on the centre of the traced outline there, at the same
+   slope, so the shin and calf run into the ankle without a step. */
+const CUT_Y=480.5;
+const LEGR={
+  f:{shin:'M101.75 479.5L123.8 479.5C121.9 488 119.8 508 118.8 525L105.4 525C104.6 510 102.5 490 101.75 479.5Z',
+     edge:'M101.75 479.5C102.5 490 104.6 510 105.4 525M123.8 479.5C121.9 488 119.8 508 118.8 525'},
+  b:{shin:'M404.85 479.5L434.4 479.5C431.4 490 428.4 510 427 525L413.4 525C411.8 510 406.05 490 404.85 479.5Z',
+     edge:'M404.85 479.5C406.05 490 411.8 510 413.4 525M434.4 479.5C431.4 490 428.4 510 427 525'}
+};
 const mirror=f=>`translate(${LEG[f].axis} 0) scale(-1 1)`;
 /* extra regions in the same shape as BODY.regions, with an optional transform */
 const EXT_REGIONS=[
-  {g:'shins',side:'R',view:'f',d:LEG.f.shin,ext:1},{g:'shins',side:'L',view:'f',d:LEG.f.shin,tf:mirror('f'),ext:1},
+  {g:'shins',side:'R',view:'f',d:LEGR.f.shin,ext:1},{g:'shins',side:'L',view:'f',d:LEGR.f.shin,tf:mirror('f'),ext:1},
   {g:'feet',side:'R',view:'f',d:LEG.f.foot},{g:'feet',side:'L',view:'f',d:LEG.f.foot,tf:mirror('f')},
-  {g:'calves',side:'L',view:'b',d:LEG.b.shin,ext:1},{g:'calves',side:'R',view:'b',d:LEG.b.shin,tf:mirror('b'),ext:1},
+  {g:'calves',side:'L',view:'b',d:LEGR.b.shin,ext:1},{g:'calves',side:'R',view:'b',d:LEGR.b.shin,tf:mirror('b'),ext:1},
   {g:'feet',side:'L',view:'b',d:LEG.b.foot},{g:'feet',side:'R',view:'b',d:LEG.b.foot,tf:mirror('b')}
 ];
 const REGIONS=BODY.regions.concat(EXT_REGIONS);
-function legLines(faces,color,w){
-  return faces.map(f=>{const L=LEG[f],p=`${L.edge}${L.foot}${L.detail}`;
+function legLines(faces,color,w,edges=LEG){
+  return faces.map(f=>{const L=LEG[f],p=`${edges[f].edge}${L.foot}${L.detail}`;
     return `<g fill="none" stroke="${color}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" pointer-events="none"><path d="${p}"/><path d="${p}" transform="${mirror(f)}"/></g>`}).join('');
 }
 /* front silhouette legs for the organ and element views (fill only; outline drawn by legLines) */
@@ -124,29 +134,28 @@ function regionFill(r){
   }
   const z=ZONE_OF(r.g,r.view);if(!z)return{fill:base,off:true,label:''};
   const sel=S.sel.treat===z;
-  return{fill:sel?mix(base,'#6CCBEA',.5):base,off:false,sel,label:ZONES[z].n};
+  return{fill:sel?mix(base,'#78B6E6',.5):base,off:false,sel,label:ZONES[z].n};
 }
 /* Warning areas carry a hatch and Caution areas a dot texture, so status never depends on color alone. */
 function patterns(){
   return `<defs>
    <pattern id="hatchBad" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="5" stroke="#FFD2D2" stroke-width="1.1" opacity=".55"/></pattern>
    <pattern id="dotWarn" width="5" height="5" patternUnits="userSpaceOnUse"><circle cx="2.5" cy="2.5" r=".8" fill="#FFF0CF" opacity=".55"/></pattern>
+   <clipPath id="aboveCut"><rect x="-400" y="-10" width="1500" height="${CUT_Y+10}"/></clipPath>
    <clipPath id="silF"><path d="${BODY.sil.f}"/><path d="${LEG.f.shin}"/><path d="${LEG.f.foot}"/><path d="${LEG.f.shin}" transform="${mirror('f')}"/><path d="${LEG.f.foot}" transform="${mirror('f')}"/></clipPath>
-   <linearGradient id="fluid" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6CCBEA" stop-opacity=".55"/><stop offset="1" stop-color="#1D5F86" stop-opacity=".35"/></linearGradient>
+   <linearGradient id="fluid" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#78B6E6" stop-opacity=".55"/><stop offset="1" stop-color="#1D5F86" stop-opacity=".35"/></linearGradient>
   </defs>`;
 }
 function muscleSVG(){
   let s=`<svg class="figure" viewBox="0 0 626 ${FIG_H}" role="group" aria-label="Body map, front and back">${patterns()}`;
   for(const r of REGIONS){
-    const f=regionFill(r),tf=r.tf?` transform="${r.tf}"`:'';
+    const f=regionFill(r),tf=(r.tf?` transform="${r.tf}"`:'')+(!r.ext&&(r.g==='shins'||r.g==='calves')?' clip-path="url(#aboveCut)"':'');
     const attrs=f.off?'':` tabindex="0" role="button" aria-label="${esc(f.label)}" data-tip="${esc(f.label)}"`;
     s+=`<path class="rg${r.ext?' ext':''}${f.off?' off':''}${f.sel?' sel':''}" d="${r.d}"${tf} fill="${f.fill}" data-g="${r.g}" data-face="${r.view}"${attrs}/>`;
     if(f.st==='bad')s+=`<path d="${r.d}"${tf} fill="url(#hatchBad)" pointer-events="none"/>`;
     if(f.st==='warn')s+=`<path d="${r.d}"${tf} fill="url(#dotWarn)" pointer-events="none"/>`;
   }
-  s+=`<path d="${BODY.lines}" fill="${FIG.line}" pointer-events="none"/>${legLines(['f','b'],FIG.line,1.4)}`;
-  /* the drawn shin pieces join the traced ones, so their selection outline is drawn on the sides only */
-  for(const r of EXT_REGIONS)if(r.ext&&regionFill(r).sel)s+=`<path d="${LEG[r.view].edge}"${r.tf?` transform="${r.tf}"`:''} fill="none" stroke="#6CCBEA" stroke-width="1.4" pointer-events="none"/>`;
+  s+=`<path d="${BODY.lines}" fill="${FIG.line}" clip-path="url(#aboveCut)" pointer-events="none"/>${legLines(['f','b'],FIG.line,1.5,LEGR)}`;
   s+=`<text class="viewlbl" x="16" y="24">Front</text><text class="viewlbl" x="610" y="24" text-anchor="end">Back</text>`;
   return s+'</svg>';
 }
@@ -158,7 +167,7 @@ function svgCallout(id,kind,side,ly,ax,ay,name,line2,line3,st,sel){
     :`<rect x="${cx-3.4}" y="${cy-3.4}" width="6.8" height="6.8" fill="${c}" transform="rotate(45 ${cx} ${cy})"/>`;
   const x=tx+(L?-12:12),a=L?'end':'start';
   return `<g class="callout${sel?' sel':''}" data-${kind}="${id}" tabindex="0" role="button" aria-label="${esc(name)}: ${STATUS_WORD[st]}">
-    <path class="leader" d="M${ax} ${ay}L${kx} ${ly-4}H${tx}"/><circle cx="${ax}" cy="${ay}" r="1.8" fill="${sel?'#6CCBEA':'#AEBAD0'}"/>
+    <path class="leader" d="M${ax} ${ay}L${kx} ${ly-4}H${tx}"/><circle cx="${ax}" cy="${ay}" r="1.8" fill="${sel?'#78B6E6':'#AEBAD0'}"/>
     ${mark}<text class="cl-n" x="${x}" y="${ly-1}" text-anchor="${a}">${esc(name)}</text>
     <text class="cl-v" x="${x}" y="${ly+11}" text-anchor="${a}" style="fill:${c}">${esc(line2)}</text>
     ${line3?`<text class="cl-m" x="${x}" y="${ly+22}" text-anchor="${a}">${esc(line3)}</text>`:''}</g>`;
@@ -191,7 +200,7 @@ function sensorSVG(){
   let s=`<svg class="figure" viewBox="-172 0 664 ${FIG_H}" role="group" aria-label="Body elements and how they are measured">${patterns()}`;
   s+=`<path d="${BODY.sil.f}" fill="${FIG.sil}" stroke="${FIG.silLine}" stroke-width="1"/>${silLegs(FIG.sil)}`;
   s+=`<g clip-path="url(#silF)" pointer-events="none"><rect x="0" y="${lvl}" width="320" height="${bot-lvl}" fill="url(#fluid)"/>
-      <path class="fluid-wave" d="M-80 ${lvl} ${Array.from({length:12},()=>'q10 -3 20 0t20 0').join(' ')} V${lvl+6} H-80Z" fill="#6CCBEA" opacity=".35"/>
+      <path class="fluid-wave" d="M-80 ${lvl} ${Array.from({length:12},()=>'q10 -3 20 0t20 0').join(' ')} V${lvl+6} H-80Z" fill="#78B6E6" opacity=".35"/>
       <line x1="0" x2="320" y1="${lvl}" y2="${lvl}" stroke="#8EDCF2" stroke-width=".8" stroke-dasharray="3 3"/></g>${legLines(['f'],FIG.silLine,1)}`;
   s+=`<g fill="none" stroke="#C25A62" stroke-opacity=".55" stroke-width="1.3" stroke-linecap="round" pointer-events="none">
       <path d="M163 138V250M163 250L142 300L126 400L113 524L104 544M163 250L182 300L196 400L206.2 524L215.2 544M160 122L104 128L70 192L34 254M160 122L216 128L250 192L286 254M153 122V58M167 122V58"/></g>
@@ -221,7 +230,7 @@ function elemReading(id){const E=ELEMENTS[id],k=E.key,v=latest(k);
 /* legend for the current body view, shown on the stage */
 function legendHTML(){
   const m=S.mode;
-  if(m==='treat')return `<span class="lg"><i class="sw" style="background:${mix(FIG.zone,'#6CCBEA',.5)}"></i>Selected area</span><span class="lg"><i class="sw" style="background:${FIG.zone}"></i>Select to open a guide</span>`;
+  if(m==='treat')return `<span class="lg"><i class="sw" style="background:${mix(FIG.zone,'#78B6E6',.5)}"></i>Selected area</span><span class="lg"><i class="sw" style="background:${FIG.zone}"></i>Select to open a guide</span>`;
   if(m==='train')return `<span class="lg"><i class="sw" style="background:${mix(FIG.muscle,'#3DBE7A',.42)}"></i>Nominal</span><span class="lg"><i class="sw" style="background:${mix(FIG.muscle,'#E9A93A',.62)} url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Ccircle cx='2' cy='2' r='.7' fill='%23FFF0CF'/%3E%3C/svg%3E&quot;)"></i>Caution, dotted</span><span class="lg"><i class="sw" style="background:${mix(FIG.muscle,'#EF5B5B',.66)} repeating-linear-gradient(45deg,rgba(255,220,220,.55) 0 1px,transparent 1px 4px)"></i>Warning, hatched</span>`;
   return ['good','warn','bad'].map(s=>`<span class="lg">${icon(s,12)}${STATUS_WORD[s]}</span>`).join('');
 }
@@ -240,11 +249,11 @@ function chart(vals,key,{w=520,h=150,labels=null}={}){
   const pts=vals.map((v,i)=>[+X(i).toFixed(1),+Y(v).toFixed(1),fmt(v,R_.dec),lab[i],STATUS_WORD[ev(key,v)]]);
   let s=`<svg class="chart" viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(R_.name)} trend, latest ${fmt(vals[vals.length-1],R_.dec)} ${R_.unit}" data-pts='${JSON.stringify(pts)}' data-unit="${esc(R_.unit)}" data-w="${w}">`;
   if(band)s+=`<rect x="${L}" y="${Y(band[1])}" width="${w-L-R}" height="${Math.max(1,Y(band[0])-Y(band[1]))}" fill="#3DBE7A" opacity=".08"/><text x="${w-R-4}" y="${Math.min(h-B-4,Y(band[0])-4)}" text-anchor="end" style="fill:#6FCF9C">reference range</text>`;
-  for(let i=0;i<=3;i++){const v=lo+(hi-lo)*i/3;s+=`<line x1="${L}" x2="${w-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="#1A2533"/><text x="${L-6}" y="${Y(v)+3}" text-anchor="end">${fmt(v,R_.dec>0?1:0)}</text>`}
+  for(let i=0;i<=3;i++){const v=lo+(hi-lo)*i/3;s+=`<line x1="${L}" x2="${w-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="#1F2731"/><text x="${L-6}" y="${Y(v)+3}" text-anchor="end">${fmt(v,R_.dec>0?1:0)}</text>`}
   s+=`<polyline points="${pts.map(p=>p[0]+','+p[1]).join(' ')}" fill="none" stroke="${col}" stroke-width="2" stroke-linejoin="round"/>`;
-  vals.forEach((v,i)=>{const c=STATUS_COLOR[ev(key,v)];if(i===vals.length-1||ev(key,v)!=='good')s+=`<circle cx="${X(i)}" cy="${Y(v)}" r="${i===vals.length-1?4.5:2.8}" fill="${c}" stroke="#0B111A" stroke-width="2"/>`});
+  vals.forEach((v,i)=>{const c=STATUS_COLOR[ev(key,v)];if(i===vals.length-1||ev(key,v)!=='good')s+=`<circle cx="${X(i)}" cy="${Y(v)}" r="${i===vals.length-1?4.5:2.8}" fill="${c}" stroke="#0C1016" stroke-width="2"/>`});
   lab.forEach((t,i)=>{if(i%Math.ceil(vals.length/7)===0||i===vals.length-1)s+=`<text x="${X(i)}" y="${h-6}" text-anchor="middle">${t}</text>`});
-  s+=`<line class="xh" x1="0" x2="0" y1="${T}" y2="${h-B}" stroke="#A9B6CB" stroke-width="1" opacity="0"/><circle class="xd" r="4.5" fill="${col}" stroke="#E6ECF5" stroke-width="1.5" opacity="0"/>`;
+  s+=`<line class="xh" x1="0" x2="0" y1="${T}" y2="${h-B}" stroke="#AEB7C2" stroke-width="1" opacity="0"/><circle class="xd" r="4.5" fill="${col}" stroke="#E8ECF1" stroke-width="1.5" opacity="0"/>`;
   s+=`<rect x="${L}" y="${T}" width="${w-L-R}" height="${h-T-B}" fill="transparent" class="hit"/>`;
   return s+'</svg>';
 }
@@ -353,9 +362,57 @@ function renderModes(){
   const counts=modeCounts();
   $('#modes').innerHTML=MODES.map(([id,t,d])=>{const l=counts[id],n=l?l.filter(s=>s!=='good').length:0;return `<button class="mode${S.mode===id?' on':''}" role="tab" aria-selected="${S.mode===id}" data-mode="${id}" title="${d}">${MODE_ICON[id]}<b>${t}</b>${n?`<i class="n ${worst(l)}" aria-label="${n} to watch">${n}</i>`:''}</button>`}).join('')+'<i class="ink" aria-hidden="true"></i>';
 }
+/* ---------- header pickers: crew member, mission, and who is using the console ---------- */
+const initials=n=>n.split(' ').filter(w=>!/^[A-Z]{2,4}$/.test(w)).map(w=>w[0]).join('').slice(0,2);
+const ROLE_ICON={astro:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.6"/><path d="M5 20c.8-3.8 3.6-6 7-6s6.2 2.2 7 6"/></svg>',
+  cmo:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M12 8.5v7M8.5 12h7"/></svg>'};
+const ROLES={astro:['Astronaut','My readings, guides and requests'],cmo:['Crew Medical Officer','Review requests from the whole crew']};
+function crewSummary(i){
+  const prev=S.crew;S.crew=i;const A=attention();S.crew=prev;
+  const nb=A.filter(a=>a.st==='bad').length,nw=A.length-nb;
+  return{st:nb?'bad':nw?'warn':'good',txt:A.length?[nb?plural(nb,'warning'):'',nw?plural(nw,'caution'):''].filter(Boolean).join(', '):'All nominal'};
+}
+const modOf=c=>{const ms=MISSIONS[S.mission].modules;return ms[Math.min(c.module,ms.length-1)]};
+const PICKERS={
+  crew:{label:'Crew member',cur:()=>String(S.crew),
+    items:()=>CREW.map((c,i)=>{const sm=crewSummary(i);return[String(i),`<span class="av s-${sm.st}">${initials(c.name)}</span><span class="po-t"><b>${esc(c.name)}</b><small>${esc(c.role)}, ${esc(modOf(c))}</small></span><span class="po-s s-${sm.st}">${icon(sm.st,12)}${esc(sm.txt)}</span>`]}),
+    pick:v=>{if(+v===S.crew)return;S.crew=+v;S.runner=null;S.ciVals=null;S.ciWater=0;S.ciMood=0;S.ciSymp=[];S.checkinPhoto=null;S.habModule=null;S.rf={};S.sd={};defaults();render(true);startMET()}},
+  mission:{label:'Mission',cur:()=>S.mission,
+    items:()=>Object.entries(MISSIONS).map(([k,m])=>[k,`<span class="po-t"><b>${esc(m.name)}</b><small>${esc(m.gravity)}. Ground link ${esc(m.delayTxt.toLowerCase())}.</small></span>`]),
+    pick:v=>{if(v===S.mission)return;S.mission=v;S.habModule=null;renderLink();render(false)}},
+  role:{label:'Using the console as',cur:()=>S.role,
+    items:()=>Object.entries(ROLES).map(([k,[t,d]])=>[k,`<span class="ri">${ROLE_ICON[k]}</span><span class="po-t"><b>${t}</b><small>${d}</small></span>`]),
+    pick:v=>{if(v===S.role)return;S.role=v;renderHeader();if(S.role==='cmo')go('review');else refreshSoft()},
+    foot:()=>`<div class="pk-sep"></div><button class="po po-end" data-endsession><span class="ri">${EXIT_ICON}</span><span class="po-t"><b>End session</b><small>Return to the sign-in screen</small></span></button>`}
+};
+let openPk=null;
+function openPicker(name){
+  closePicker();
+  const P=PICKERS[name],wrap=document.querySelector(`.picker[data-pk="${name}"]`),pop=wrap.querySelector('.pk-pop'),cur=P.cur();
+  const tick='<svg class="tick" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.3l2.3 2.3 4.7-5"/></svg>';
+  pop.innerHTML=`<div class="pk-h">${P.label}</div>`+P.items().map(([v,h])=>`<button class="po${v===cur?' on':''}" role="option" aria-selected="${v===cur}" data-pick="${name}:${v}">${h}${v===cur?tick:''}</button>`).join('')+(P.foot?P.foot():'');
+  pop.hidden=false;requestAnimationFrame(()=>{if(openPk===name)wrap.classList.add('open')});
+  wrap.querySelector('.pk-btn').setAttribute('aria-expanded','true');openPk=name;
+  (pop.querySelector('.po.on')||pop.querySelector('.po')).focus();
+}
+function closePicker(focusBtn){
+  if(!openPk)return;
+  const wrap=document.querySelector(`.picker[data-pk="${openPk}"]`),b=wrap.querySelector('.pk-btn');
+  wrap.classList.remove('open');wrap.querySelector('.pk-pop').hidden=true;b.setAttribute('aria-expanded','false');
+  if(focusBtn)b.focus();openPk=null;
+}
+function renderHeader(){
+  const c=crew(),m=mission(),sm=crewSummary(S.crew);
+  $('#crewAv').textContent=initials(c.name);$('#crewAv').className='av s-'+sm.st;
+  $('#crewName').textContent=c.name;
+  $('#whoSub').textContent=`${c.role}, mission day ${c.day}`;
+  $('#missionName').textContent=m.name;
+  $('#roleIcon').innerHTML=ROLE_ICON[S.role];$('#roleName').textContent=S.role==='cmo'?'Medical officer':'Astronaut';
+  $('#app').dataset.role=S.role;
+  saveSession();
+}
 function renderDeck(swap){
-  const c=crew();
-  $('#whoSub').textContent=`${c.role}, mission day ${c.day}, ${moduleName()}`;
+  renderHeader();
   renderModes();
   $('#legend').innerHTML=legendHTML();
   renderFigure(swap);
@@ -379,7 +436,7 @@ function renderPanel(anim='panel'){
 }
 function render(swap=true){renderNav();renderDeck(swap);renderPanel('panel')}
 function go(v){S.view=v;renderNav();renderPanel('panel')}
-function refreshSoft(){renderNav();renderPanel(null)}
+function refreshSoft(){renderNav();renderHeader();renderPanel(null)}
 
 /* ===== OVERVIEW ===== */
 VIEWS.overview={w:520,
@@ -444,7 +501,7 @@ function trainDetail(mu){
 function sessionHTML(mu){
   const c=crew(),x=S.xp[c.id],[done,plan]=c.sessions;
   return `<div class="actbox"><div class="xp"><b>${x.streak}-day streak</b><div class="xbar"><i style="width:${Math.min(100,done/plan*100)}%"></i></div><span>${done}/${plan} sessions</span></div>
-    <div class="badges">${badgeList()}</div><button class="btn meteor" data-startsession="${mu}"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>Start guided session</button></div>`;
+    <div class="badges">${badgeList()}</div><button class="btn primary" data-startsession="${mu}"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>Start guided session</button></div>`;
 }
 function badgeList(){const b=S.xp[crew().id].badges;return [['first','First check-in'],['streak7','7-day streak'],['bone','Bone guardian'],['hydro','Hydration hero'],['team','Crew goal']].map(([k,t])=>`<span class="badge${b.has(k)||(k==='streak7'&&S.xp[crew().id].streak>=7)?'':' locked'}"><i>★</i>${t}</span>`).join('')}
 function runnerHTML(){
@@ -452,7 +509,7 @@ function runnerHTML(){
   return `<div class="runner"><div class="row"><span class="small muted">Exercise ${r.ex+1} of ${M.ex.length}</span><span class="spacer"></span><button class="btn ghost sm" data-endsession>End session</button></div>
     <div class="row" style="margin-top:6px;align-items:flex-end"><div><div class="h2">${esc(e[0])}</div><div class="small ink2">${esc(eq[e[1]])}, ${esc(e[2])}. ${esc(e[3])}</div></div><span class="spacer"></span><div class="big" id="restT">${r.rest>0?r.rest+'s':''}</div></div>
     <div class="sets">${Array.from({length:sets},(_,i)=>`<i class="${i<r.set?'on':''}"></i>`).join('')}</div>
-    <div class="row"><span class="small muted">${r.rest>0?'Rest, then start the next set':'Set '+(Math.min(r.set+1,sets))+' of '+sets}</span><span class="spacer"></span><button class="btn meteor" data-setdone ${r.rest>0?'disabled':''}>Set complete</button></div></div>`;
+    <div class="row"><span class="small muted">${r.rest>0?'Rest, then start the next set':'Set '+(Math.min(r.set+1,sets))+' of '+sets}</span><span class="spacer"></span><button class="btn primary" data-setdone ${r.rest>0?'disabled':''}>Set complete</button></div></div>`;
 }
 const zoneOf=cond=>Object.keys(ZONES).find(z=>ZONES[z].conds.includes(cond));
 function treatDetail(z){
@@ -491,11 +548,11 @@ function bmdChart(c){
   const w=520,h=150,L=34,R=10,T=10,B=22,lo=-10,hi=1,X=m=>L+m*(w-L-R)/6,Y=v=>T+(hi-v)*(h-T-B)/(hi-lo),now=c.day/30.4;
   let s=`<svg class="chart" viewBox="0 0 ${w} ${h}" role="img" aria-label="Bone density projection">`;
   s+=`<polygon points="${X(0)},${Y(0)} ${X(6)},${Y(-6)} ${X(6)},${Y(-9)} ${X(0)},${Y(0)}" fill="#E9A93A" opacity=".10"/><text x="${X(6)-4}" y="${Y(-7.6)}" text-anchor="end" style="fill:#F2CF8E">typical in flight, 1 to 1.5 %/mo</text>`;
-  for(let v=0;v>=-10;v-=5)s+=`<line x1="${L}" x2="${w-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="#1A2533"/><text x="${L-6}" y="${Y(v)+3}" text-anchor="end">${v}%</text>`;
+  for(let v=0;v>=-10;v-=5)s+=`<line x1="${L}" x2="${w-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="#1F2731"/><text x="${L-6}" y="${Y(v)+3}" text-anchor="end">${v}%</text>`;
   for(let m=0;m<=6;m++)s+=`<text x="${X(m)}" y="${h-6}" text-anchor="middle">${m===0?'Launch':m+' mo'}</text>`;
   const col=STATUS_COLOR[ev('bmd',c.bmd)],n6=Math.min(now,6);
   s+=`<line x1="${X(0)}" y1="${Y(0)}" x2="${X(n6)}" y2="${Y(-c.bmd*n6)}" stroke="${col}" stroke-width="2.4"/><line x1="${X(n6)}" y1="${Y(-c.bmd*n6)}" x2="${X(6)}" y2="${Y(-c.bmd*6)}" stroke="${col}" stroke-width="2" stroke-dasharray="5 4"/>`;
-  s+=`<circle cx="${X(n6)}" cy="${Y(-c.bmd*n6)}" r="4.5" fill="${col}" stroke="#0B111A" stroke-width="1.4"/><text x="${X(n6)+8}" y="${Y(-c.bmd*n6)-6}" style="fill:#E6ECF5;font-weight:600">Today</text>`;
+  s+=`<circle cx="${X(n6)}" cy="${Y(-c.bmd*n6)}" r="4.5" fill="${col}" stroke="#0C1016" stroke-width="1.4"/><text x="${X(n6)+8}" y="${Y(-c.bmd*n6)-6}" style="fill:#E8ECF1;font-weight:600">Today</text>`;
   return s+'</svg>';
 }
 function elemDetail(e){
@@ -530,8 +587,8 @@ function elemActions(e){
 function doseBar(c){
   const w=520,L=6,R=6,X=v=>L+v/600*(w-L-R),tot=c.prior+c.missionDose,col=STATUS_COLOR[ev('career',tot)];
   return `<svg class="chart" viewBox="0 0 ${w} 84" role="img" aria-label="Career dose ${tot} of 600 mSv">
-  <text x="${Math.max(30,X(tot))}" y="12" text-anchor="middle" style="fill:#E6ECF5;font-weight:600;font-size:11px">${tot} mSv now</text>
-  <rect x="${L}" y="20" width="${w-L-R}" height="14" rx="2" fill="#1F2B3B"/><rect x="${L}" y="20" width="${Math.max(0,X(c.prior)-L)}" height="14" fill="#6F7FA0"/>
+  <text x="${Math.max(30,X(tot))}" y="12" text-anchor="middle" style="fill:#E8ECF1;font-weight:600;font-size:11px">${tot} mSv now</text>
+  <rect x="${L}" y="20" width="${w-L-R}" height="14" rx="2" fill="#232C37"/><rect x="${L}" y="20" width="${Math.max(0,X(c.prior)-L)}" height="14" fill="#6F7FA0"/>
   <rect x="${X(c.prior)}" y="20" width="${X(tot)-X(c.prior)}" height="14" fill="${col}"/><line x1="${X(600)-1}" x2="${X(600)-1}" y1="14" y2="40" stroke="#EF5B5B" stroke-width="2"/>
   <rect x="${L}" y="50" width="10" height="10" rx="1" fill="#6F7FA0"/><text x="${L+15}" y="59">Earlier missions ${c.prior} mSv</text>
   <rect x="${L+190}" y="50" width="10" height="10" rx="1" fill="${col}"/><text x="${L+205}" y="59">This mission ${c.missionDose} mSv</text>
@@ -551,7 +608,7 @@ VIEWS.checkin={w:640,
   sub:()=>`Mission day ${crew().day}. Type a value, tap the scales, or import from the wearable.`,
   html(){
     const c=crew(),v=S.ciVals||{},water=S.ciWater??0,mood=S.ciMood??0,x=S.xp[c.id],team=CREW.reduce((a,cc)=>a+S.xp[cc.id].pts,0);
-    return `<div class="actions-row"><button class="btn meteor" data-submitci><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Submit check-in</button><button class="btn ghost" data-fillsensor><svg viewBox="0 0 24 24"><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/><circle cx="12" cy="12" r="4"/></svg>Import from wearable</button></div>`
+    return `<div class="actions-row"><button class="btn primary" data-submitci><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Submit check-in</button><button class="btn ghost" data-fillsensor><svg viewBox="0 0 24 24"><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/><circle cx="12" cy="12" r="4"/></svg>Import from wearable</button></div>`
     +CI_FIELDS.map(([t,src,mk,fs])=>blk(t,`<button class="linkbtn" data-almanac="${MEASURE_OF[mk]}">How to measure</button>`,`<div class="fields">${fs.map(([k,l])=>{const val=v[k]??'';const st=val!==''?ev(k,+val):null;
       return `<div class="field"><label for="f_${k}">${l}</label><div class="inp"><input id="f_${k}" inputmode="decimal" data-ci="${k}" value="${val}" placeholder="${fmt(latest(k),RULES[k].dec)}"><span class="u">${RULES[k].unit}</span></div><div class="lv" id="lv_${k}">${lvHTML(k,st)}</div></div>`}).join('')}</div>`,'ci')).join('')
     +blk('Mood and stress','1 very low, 5 very good',`<div class="scale" role="radiogroup" aria-label="Mood">${[1,2,3,4,5].map(n=>`<button class="${mood===n?'on':''}" data-mood="${n}" role="radio" aria-checked="${mood===n}">${n}</button>`).join('')}</div>`)
@@ -625,7 +682,7 @@ VIEWS.weather={w:580,
 };
 function typeBars(counts){
   const types=['RBE','CME','GST','SEP','Report'],max=Math.max(...types.map(t=>counts[t]||0),1),w=520,row=26;
-  return `<svg class="chart" viewBox="0 0 ${w} ${types.length*row+6}" role="img" aria-label="Notifications by type">${types.map((t,i)=>{const v=counts[t]||0,T=DONKI_TYPES[t];return `<text x="0" y="${i*row+17}" style="fill:#A9B6CB;font-weight:600">${T.label}</text><rect x="48" y="${i*row+6}" width="${Math.max(2,(w-90)*v/max)}" height="15" rx="2" fill="${T.color}" opacity=".8"/><text x="${54+(w-90)*v/max}" y="${i*row+17}" style="fill:#E6ECF5;font-weight:600">${v}</text>`}).join('')}</svg>`;
+  return `<svg class="chart" viewBox="0 0 ${w} ${types.length*row+6}" role="img" aria-label="Notifications by type">${types.map((t,i)=>{const v=counts[t]||0,T=DONKI_TYPES[t];return `<text x="0" y="${i*row+17}" style="fill:#AEB7C2;font-weight:600">${T.label}</text><rect x="48" y="${i*row+6}" width="${Math.max(2,(w-90)*v/max)}" height="15" rx="2" fill="${T.color}" opacity=".8"/><text x="${54+(w-90)*v/max}" y="${i*row+17}" style="fill:#E8ECF1;font-weight:600">${v}</text>`}).join('')}</svg>`;
 }
 
 /* ===== MEDICAL REVIEW ===== */
@@ -660,7 +717,7 @@ function reviewList(){return S.role==='cmo'?S.cases:S.cases.filter(c=>c.crew===c
 function activeCase(){const list=reviewList();return list.find(c=>c.id===S.activeCase)||list[list.length-1]}
 VIEWS.review={w:640,
   title:()=>'Medical review',
-  status:()=>pill(S.role==='cmo'?'warn':'info',S.role==='cmo'?'Crew Medical Officer':'Astronaut'),
+  status:()=>pill('info',S.role==='cmo'?'Crew Medical Officer':'Astronaut'),
   sub:()=>S.role==='cmo'?'Requests from the whole crew. Verify, approve, ask for a re-measure, or escalate.':'Your requests to the Crew Medical Officer and the plans that come back.',
   html(){
     const cmo=S.role==='cmo',list=reviewList(),cs=activeCase();
@@ -752,13 +809,17 @@ function openAlmanac(id){
   document.querySelectorAll('.al-i').forEach(b=>b.classList.toggle('on',b.dataset.almanac===id));
 }
 document.addEventListener('click',e=>{
+  const pkb=e.target.closest('[data-picker]'),pko=e.target.closest('[data-pick]');
+  if(pkb){const n=pkb.dataset.picker;if(openPk===n)closePicker();else openPicker(n);return}
+  if(pko){const [n,v]=pko.dataset.pick.split(':');closePicker(true);PICKERS[n].pick(v);return}
+  if(openPk&&!e.target.closest('.picker'))closePicker();
   const t=e.target.closest('button,.rg,.organ,.callout,a');if(!t)return;
   if(t.tagName==='A')return;
   const ds=t.dataset;
   if(ds.closemodal!==undefined&&!ds.view)return;
   if(ds.view){if(ds.closemodal!==undefined)$('#modal').hidden=true;go(ds.view);return}
   if(ds.act){act(ds.act);return}
-  if(ds.role){S.role=ds.role;document.querySelectorAll('.role-btn').forEach(b=>{const on=b===t;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on)});inks($('.rail'));if(S.role==='cmo')go('review');else refreshSoft();return}
+  if(ds.role){PICKERS.role.pick(ds.role);return}
   if(ds.mode){if(S.mode===ds.mode)return;S.mode=ds.mode;
     document.querySelectorAll('#modes .mode').forEach(b=>{const on=b.dataset.mode===S.mode;b.classList.toggle('on',on);b.setAttribute('aria-selected',on)});inks($('.deck'));
     $('#legend').innerHTML=legendHTML();renderFigure(true);if(S.view==='part')renderPanel('panel');return}
@@ -797,6 +858,14 @@ document.addEventListener('click',e=>{
   if(ds.fillsensor!==undefined){const d=data();S.ciVals={};['hr','sys','dia','spo2','glu','temp','na','k','sleep','kcal'].forEach(k=>S.ciVals[k]=fmt(d[k][N-1],RULES[k].dec).replace(/,/g,''));renderPanel(null);toast('<span>Readings imported from the wearable and glucometer.</span>');return}
   if(ds.submitci!==undefined){submitCI();return}
 });
+document.addEventListener('keydown',e=>{
+  if(!openPk)return;
+  const pop=document.querySelector(`.picker[data-pk="${openPk}"] .pk-pop`),opts=[...pop.querySelectorAll('.po')],i=opts.indexOf(document.activeElement);
+  if(e.key==='Escape'){e.preventDefault();closePicker(true)}
+  else if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();const n=e.key==='ArrowDown'?(i+1)%opts.length:(i-1+opts.length)%opts.length;opts[n].focus()}
+  else if(e.key==='Home'||e.key==='End'){e.preventDefault();opts[e.key==='Home'?0:opts.length-1].focus()}
+  else if(e.key==='Tab')closePicker();
+});
 document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches('.rg,svg .organ,svg .callout')){e.preventDefault();e.target.dispatchEvent(new MouseEvent('click',{bubbles:true}))}});
 document.addEventListener('input',e=>{
   const k=e.target.dataset.ci;if(k){S.ciVals=S.ciVals||{};S.ciVals[k]=e.target.value;const v=parseFloat(e.target.value),lv=$('#lv_'+k);if(lv)lv.innerHTML=lvHTML(k,isNaN(v)?null:ev(k,v))}
@@ -805,8 +874,6 @@ document.addEventListener('input',e=>{
 });
 document.addEventListener('change',e=>{
   const t=e.target;
-  if(t.id==='crewSel'){S.crew=+t.value;S.runner=null;S.ciVals=null;S.ciWater=0;S.ciMood=0;S.ciSymp=[];S.checkinPhoto=null;S.habModule=null;S.rf={};S.sd={};defaults();render(true);startMET()}
-  if(t.id==='missionSel'){S.mission=t.value;S.habModule=null;renderLink();render(false)}
   if(t.id==='habSel'){S.habModule=+t.value;renderPanel('soft')}
   if(t.id==='ciPhoto'&&t.files[0]){const f=t.files[0],r=new FileReader();r.onload=()=>{S.checkinPhoto=r.result;renderPanel(null);toast('<span>Photo attached. It stays on board.</span>')};r.readAsDataURL(f)}
   if(t.dataset.symp!==undefined)S.ciSymp=[...document.querySelectorAll('[data-symp]:checked')].map(i=>i.dataset.symp);
@@ -839,9 +906,66 @@ $('#panel').addEventListener('transitionend',e=>{if(e.target.id==='panel')inks()
 function renderLink(){const m=mission(),el=$('#linkChip');el.className='link'+(m.delay>0?' delay':'');el.innerHTML=`<i></i>${esc(m.delayTxt)}`}
 let metT=null;
 function startMET(){clearInterval(metT);const c=crew();let t=c.day*86400+8*3600+15*60;const tick=()=>{t++;const d=Math.floor(t/86400),h=String(Math.floor(t%86400/3600)).padStart(2,'0'),m=String(Math.floor(t%3600/60)).padStart(2,'0'),s=String(t%60).padStart(2,'0');$('#met').textContent=`${d} d ${h}:${m}:${s}`};tick();metT=setInterval(tick,1000)}
-$('#missionSel').innerHTML=Object.entries(MISSIONS).map(([k,m])=>`<option value="${k}">${esc(m.name)}</option>`).join('');
-$('#crewSel').innerHTML=CREW.map((c,i)=>`<option value="${i}">${esc(c.name)}</option>`).join('');
+/* ---------- session: who is using the console ----------
+   Kept in sessionStorage for this tab only, so a refresh stays signed in and closing the tab ends the session. */
+const SKEY='hcg.session';
+const store={get(){try{return JSON.parse(sessionStorage.getItem(SKEY))}catch(e){return null}},
+  set(v){try{sessionStorage.setItem(SKEY,JSON.stringify(v))}catch(e){}},
+  clear(){try{sessionStorage.removeItem(SKEY)}catch(e){}}};
+let inSession=false;
+const gate={role:'astro',crew:0};
+const EXIT_ICON='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4"/><path d="M10 8l-4 4 4 4M6 12h10"/></svg>';
+function saveSession(){if(inSession)store.set({crew:S.crew,role:S.role,mission:S.mission})}
+function gateHTML(){
+  const m=mission();
+  const roles=Object.entries(ROLES).map(([k,[t,d]])=>`<label class="g-opt"><input type="radio" name="g-role" value="${k}"${gate.role===k?' checked':''}><span class="ri">${ROLE_ICON[k]}</span><span class="po-t"><b>${t}</b><small>${d}</small></span></label>`).join('');
+  const crewList=CREW.map((c,i)=>{const sm=crewSummary(i);return `<label class="g-opt"><input type="radio" name="g-crew" value="${i}"${gate.crew===i?' checked':''}><span class="av s-${sm.st}">${initials(c.name)}</span><span class="po-t"><b>${esc(c.name)}</b><small>${esc(c.role)}, mission day ${c.day}</small></span><span class="po-s s-${sm.st}">${icon(sm.st,12)}${esc(sm.txt)}</span></label>`}).join('');
+  return `<div class="gate-shell">
+  <header class="gate-top">
+    <a class="brand" href="index.html">Health Check at a Glance</a>
+    <a class="gate-back" href="index.html"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M7.5 3l-3 3 3 3"/></svg>Home</a>
+  </header>
+  <form class="gate-card" id="gateForm" aria-labelledby="gateT">
+    <h1 id="gateT">Start a session</h1>
+    <p class="gate-lede">Choose how you are using the console and whose readings it should open on.</p>
+    <fieldset><legend>Using the console as</legend><div class="g-grid two">${roles}</div></fieldset>
+    <fieldset><legend id="gCrewL">${gate.role==='cmo'?'Crew member to open first':'Who are you?'}</legend><div class="g-grid">${crewList}</div></fieldset>
+    <div class="g-foot">
+      <div class="tm"><small>Mission</small><b>${esc(m.name)}</b></div>
+      <div class="tm"><small>Ground link</small><b class="link${m.delay>0?' delay':''}"><i></i>${esc(m.delayTxt)}</b></div>
+      <button class="btn primary g-go" type="submit">Start session</button>
+    </div>
+  </form>
+</div>`;
+}
+function showGate(instant){
+  inSession=false;closePicker();
+  if(!$('#modal').hidden)hideModal();
+  const g=$('#gate');g.innerHTML=gateHTML();g.hidden=false;$('#app').inert=true;
+  if(instant)g.classList.add('on');
+  else{requestAnimationFrame(()=>g.classList.add('on'));const f=g.querySelector('input[name="g-role"]:checked');if(f)f.focus({preventScroll:true})}
+}
+function startSession(){
+  if(gate.crew!==S.crew)PICKERS.crew.pick(String(gate.crew));
+  S.role=gate.role;S.view=S.role==='cmo'?'review':'overview';
+  inSession=true;render(true);saveSession();
+  const g=$('#gate');g.classList.remove('on');$('#app').inert=false;
+  setTimeout(()=>{if(inSession){g.hidden=true;g.innerHTML=''}},420);
+  const first=$('#ann .key.on')||$('#ann .key');if(first)first.focus({preventScroll:true});
+}
+function endSession(){store.clear();gate.role=S.role;gate.crew=S.crew;showGate(false)}
+$('#gate').addEventListener('change',e=>{
+  const t=e.target;
+  if(t.name==='g-role'){gate.role=t.value;$('#gCrewL').textContent=gate.role==='cmo'?'Crew member to open first':'Who are you?'}
+  if(t.name==='g-crew')gate.crew=+t.value;
+});
+$('#gate').addEventListener('submit',e=>{e.preventDefault();startSession()});
+document.addEventListener('click',e=>{if(e.target.closest('[data-endsession]')){closePicker();endSession()}});
+
+const sess=store.get();
+if(sess&&CREW[sess.crew]&&MISSIONS[sess.mission]&&ROLES[sess.role]){S.crew=sess.crew;S.role=sess.role;S.mission=sess.mission;S.view=S.role==='cmo'?'review':'overview';inSession=true}
 defaults();renderLink();startMET();render(false);inks();
+if(!inSession)showGate(true);
 /* Refresh space weather from DONKI when a network link exists; keep the on-board copy otherwise. */
 S.feed='cached';
 (function liveDonki(){
@@ -855,5 +979,10 @@ S.feed='cached';
      if(items.length){items.sort((a,b)=>a[2]<b[2]?1:-1);DONKI.length=0;items.forEach(i=>DONKI.push(i));S.feed='live';renderNav();if(S.view==='weather')renderPanel(null)}
    }).catch(()=>{});
 })();
-window.__HCG={S,render,go};
+/* Offline cache when served over the web (not from file:// or inside an artifact preview). */
+if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.ai|claudeusercontent/.test(location.hostname)){
+  const l=document.createElement('link');l.rel='manifest';l.href='manifest.webmanifest';document.head.appendChild(l);
+  window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+}
+window.__HCG={S,render,go,pick:(n,v)=>PICKERS[n].pick(String(v)),start:(c=0,r='astro')=>{gate.crew=+c;gate.role=r;startSession()},end:endSession};
 })();
